@@ -30,6 +30,16 @@ GazeboMavlinkInterface::~GazeboMavlinkInterface() {
   updateConnection_->~Connection();
 }
 
+template <class T>
+T our_any_cast(const boost::any &val) {
+#if GAZEBO_MAJOR_VERSION >= 11
+	return gazebo::physics::PhysicsEngine::any_cast<T>(val);
+#else
+	return boot::any_cast<T>(val);
+#endif
+}
+
+
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
   model_ = _model;
@@ -234,7 +244,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     // Therefore it makes sense to check these params.
 
     presetManager->GetCurrentProfileParam("real_time_update_rate", param);
-    double real_time_update_rate = boost::any_cast<double>(param);
+    double real_time_update_rate = our_any_cast<double>(param);
     const double correct_real_time_update_rate = 250.0;
     if (real_time_update_rate != correct_real_time_update_rate)
     {
@@ -244,7 +254,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
-    const double max_step_size = boost::any_cast<double>(param);
+    const double max_step_size = our_any_cast<double>(param);
     const double correct_max_step_size = 0.004;
     if (max_step_size != correct_max_step_size)
     {
